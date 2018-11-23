@@ -28,7 +28,6 @@ var fireOptlyKissTracking = function(){
 **  5 * 200ms = 1000ms = 1sec
 **/
 var pollFor = parseInt(extension.pollingTime)*5;
-//var pollFor = 50; // 10 sec
 
 // Initiate polling for GA object.
 var count = 0;
