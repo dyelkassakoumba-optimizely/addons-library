@@ -1,0 +1,32 @@
+{
+  "plugin_type": "analytics_integration",
+  "name": "Kissmetrics",
+  "form_schema": [
+    {
+      "default_value": "10",
+      "field_type": "dropdown",
+      "name": "pollingTime",
+      "label": "Polling Time (Sec)",
+      "options": {
+        "choices": [
+          {
+            "value": "5",
+            "label": "5 Seconds"
+          },
+          {
+            "value": "10",
+            "label": "10 Seconds"
+          },
+          {
+            "value": "20",
+            "label": "20 Seconds"
+          }
+        ]
+      }
+    }
+  ],
+  "description": "",
+  "options": {
+    "track_layer_decision": "/*\n * Javascript written in this tab will run every time a user is\n * assigned to an experiment and variation, but before any experiment\n * code runs. This hook is useful for tracking which variations a\n * visitor has been assigned to. Click the help icon for more information.\n */\n\n// Initialise the experiment values\nvar state = window.optimizely.get('state');\nvar decision = state.getDecisionObject({ campaignId: campaignId });\nvar experimentName = decision.experiment.replace(' ('+experimentId+')', '');\nvar variationName = decision.variation.replace(' ('+variationId+')', '');\nvar traits = {};\n\n// Send experiment data back to Kissmetrics\nvar fireOptlyKissTracking = function(){\n  traits['Optimizely ' + experimentName] = variationName;\n  window._kmq.push(['set', traits]);\n};\n\n/** \n**  Converting polling time to account for the 200ms polling interval.\n**  E.g for 1 second polling time. \n**  1 * 5 = 5\n**  5 * 200ms = 1000ms = 1sec\n**/\nvar pollFor = parseInt(extension.pollingTime)*5;\n\n// Initiate polling for GA object.\nvar count = 0;\nvar poll = setInterval(function(){ \n    count++;\n    console.log(\"Searching For Kiss\");\n    if (count >= pollFor)\n    {\n        clearInterval(poll);\n        console.log(\"Timeout For Kiss\");\n    }\n    if (typeof window._kmq !== 'undefined')\n        {\n            console.log(\"Kiss Found!\");\n            fireOptlyKissTracking();\n            clearInterval(poll);\n            \n        }\n}, 200);\n"
+  }
+}
